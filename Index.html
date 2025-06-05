@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prachi Jain - Portfolio</title>
+
+  <!-- Fonts and Particles CDN -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0a192f;
+      color: #ccd6f6;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+    }
+
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .main-container {
+      text-align: center;
+      padding-top: 80px;
+    }
+
+    .hexagon img {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 4px solid #00c6d9;
+    }
+
+    .name {
+      font-size: 2.5em;
+      margin: 0.5em 0;
+      color: #00c6d9;
+    }
+
+    .description {
+      font-size: 1.2em;
+      color: #8892b0;
+      margin-bottom: 1.5em;
+    }
+
+    .circle-navigation {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 30px;
+    }
+
+    .nav-item {
+      background: #112240;
+      padding: 15px 25px;
+      border-radius: 50px;
+      color: #ccd6f6;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+      background: #00c6d9;
+      color: #0a192f;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      background: #112240;
+      color: white;
+      padding: 30px;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 10px;
+      z-index: 999;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 15px #00c6d9;
+    }
+
+    .modal h2 {
+      color: #00c6d9;
+      margin-top: 0;
+    }
+
+    .modal ul, .modal p {
+      text-align: left;
+    }
+
+    .close-btn, .resume-download {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #00c6d9;
+      border: none;
+      color: #0a192f;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .profile-container {
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="particles-js"></div>
+  <div class="main-container">
+    <div class="profile-container">
+      <div class="hexagon">
+        <img src="https://raw.githubusercontent.com/Mnt223/Mnt-codes/main/profile.jpg" alt="Profile" />
+      </div>
+      <h1 class="name">Prachi Jain</h1>
+      <p class="description">Data Analyst | AI & ML Enthusiast | Business Intelligence</p>
+    </div>
+
+    <div class="circle-navigation">
+      <div class="nav-item" onclick="openModal('skillsModal')">Skills</div>
+      <div class="nav-item" onclick="openModal('projectsModal')">Projects</div>
+      <div class="nav-item" onclick="openModal('certificatesModal')">Certificates</div>
+      <div class="nav-item" onclick="openModal('academicsModal')">Academics</div>
+      <div class="nav-item" onclick="openModal('resumeModal')">Resume</div>
+      <div class="nav-item" onclick="openModal('contactModal')">Contact</div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal" id="skillsModal">
+    <div class="modal-content">
+      <h2>Skills</h2>
+      <ul>
+        <li>Python, SQL, SAS</li>
+        <li>Power BI, Tableau</li>
+        <li>Machine Learning, PyCaret</li>
+        <li>Automation, Streamlit</li>
+      </ul>
+      <button class="close-btn" onclick="closeModal('skillsModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="projectsModal">
+    <div class="modal-content">
+      <h2>Projects</h2>
+      <p>Transactor to Revolver Model<br/>Revolver at Risk Model<br/>Spend-Based Targeting Dashboard</p>
+      <button class="close-btn" onclick="closeModal('projectsModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="certificatesModal">
+    <div class="modal-content">
+      <h2>Certificates</h2>
+      <ul>
+        <li>Google Data Analytics</li>
+        <li>Power BI Advanced</li>
+      </ul>
+      <button class="close-btn" onclick="closeModal('certificatesModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="academicsModal">
+    <div class="modal-content">
+      <h2>Academics</h2>
+      <p>B.E. in Computer Science - 2020</p>
+      <button class="close-btn" onclick="closeModal('academicsModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="resumeModal">
+    <div class="modal-content">
+      <h2>Resume</h2>
+      <a class="resume-download" href="Prachi_Resume.pdf" download>Download Resume</a>
+      <button class="close-btn" onclick="closeModal('resumeModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="contactModal">
+    <div class="modal-content">
+      <h2>Contact</h2>
+      <p>Email: prachi.jain@example.com</p>
+      <p>GitHub: <a href="https://github.com/Mnt223" target="_blank">Mnt223</a></p>
+      <button class="close-btn" onclick="closeModal('contactModal')">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    // Load particles.js
+    particlesJS('particles-js', {
+      "particles": {
+        "number": { "value": 50 },
+        "color": { "value": "#00c6d9" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.6 },
+        "size": { "value": 3 },
+        "line_linked": {
+          "enable": true,
+          "distance": 120,
+          "color": "#00c6d9",
+          "opacity": 0.4,
+          "width": 1
+        },
+        "move": {
+          "enable": true,
+          "speed": 2
+        }
+      }
+    });
+  </script>
+</body>
+</html>
