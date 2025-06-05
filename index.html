@@ -57,7 +57,7 @@
       --shadow-medium: 0 6px 20px rgba(0,0,0,0.3);
       --footer-height-val: 75; /* Numerical value for JS */
       --footer-height-landscape-val: 60; /* Numerical value for JS */
-      --footer-height: calc(var(--footer-height-val) * 1px);
+      --footer-height: calc(var(--footer-height-val) * 1px); /* Default footer height */
       --transition-speed: 0.3s;
     }
 
@@ -91,9 +91,8 @@
       margin: 0;
       padding: 0;
     }
-    html, body {
-        height: 100%;
-        /* overflow-x: hidden; REMOVED from html, kept on body */
+    html {
+        height: 100%; /* Ensure html takes full height */
     }
     body {
       font-family: var(--font-alt);
@@ -103,7 +102,10 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-      overflow-x: hidden; /* IMPORTANT: Prevent horizontal scroll on body */
+      overflow-x: hidden;
+      min-height: 100%; /* Ensure body takes at least full viewport height */
+      display: flex; /* Added to help portfolio container take full height if needed */
+      flex-direction: column; /* Added */
     }
 
     /* Particle.js Background Styling & Loader */
@@ -144,14 +146,15 @@
     /* Main Portfolio Container */
     .portfolio-container {
       display: flex;
-      min-height: 100vh;
-      position: relative; /* This is important for children positioning if not fixed */
-      z-index: 1; /* Ensure it's above particles */
+      flex-grow: 1; /* Allow it to grow to fill body height */
+      width: 100%; /* Take full width */
+      position: relative;
+      z-index: 1;
     }
 
     /* Sidebar Navigation */
     .sidebar {
-      width: var(--sidebar-width); /* Default width */
+      /* width is set by JS via updateLayout or by media query for initial state */
       background: var(--sidebar-bg);
       display: flex;
       flex-direction: column;
@@ -163,7 +166,7 @@
       left: 0;
       z-index: 100;
       box-shadow: 3px 0 12px rgba(0,0,0,0.15);
-      transition: background-color var(--transition-speed) ease, width var(--transition-speed) ease; /* Added width transition */
+      transition: background-color var(--transition-speed) ease, width var(--transition-speed) ease;
     }
     .sidebar-nav-item {
       color: var(--icon-color);
@@ -214,16 +217,14 @@
     /* Main Content Area */
     .main-content-area {
       flex-grow: 1;
-      /* margin-left will be set by JS or by media query for initial load */
+      /* margin-left and padding-bottom are set by JS */
       overflow-y: auto;
       overflow-x: hidden;
-      height: 100vh;
+      /* height: 100vh; This might conflict with flex-grow, let JS handle height via home section */
       position: relative;
-      /* padding-bottom will be set by JS */
-      transition: margin-left var(--transition-speed) ease; /* Keep transition for margin */
+      transition: margin-left var(--transition-speed) ease;
     }
 
-    /* Profile Section Styling (Home Section's content wrapper) */
     .profile-section {
       display: flex;
       flex-direction: column;
@@ -232,19 +233,18 @@
       width: 100%;
       max-width: 750px;
       margin: 0 auto;
-      padding: 20px; /* Padding for content within profile section */
+      padding: 20px;
       position: relative;
       z-index: 2;
     }
 
-    /* General Section Styling */
     .section {
         display: none;
-        padding-bottom: 50px; /* Space for content before footer potentially overlaps */
+        padding-bottom: 50px;
         width: 100%;
         position: relative;
         z-index: 2;
-        background-color: transparent; /* Default, particles show through */
+        background-color: transparent;
     }
     .section:not(#home), .section#resume, .section#contact {
         padding: 40px clamp(15px, 4vw, 40px);
@@ -254,28 +254,24 @@
         animation: fadeInSmooth 0.6s ease-out forwards;
     }
 
-    /* Special fixed layout for Home section when it's active - controlled by JS for left/width */
     .section#home.home-active-centered-fixed {
-      display: flex !important; /* Needs to be flex to honor align/justify */
-      flex-direction: column;   /* Stack content vertically */
-      align-items: center;      /* Center .profile-section horizontally */
-      justify-content: center;  /* Center .profile-section vertically */
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       position: fixed;
       top: 0;
-      /* left and width set by JS */
-      /* height set by JS */
-      padding: 0; /* Padding is on .profile-section now */
+      /* left, width, height are set by JS */
+      padding: 0;
       z-index: 5;
       overflow-y: auto;
       overflow-x: hidden;
-      background-color: transparent; /* Particles show through */
-      /* Transitions for left/width removed, handled by JS update */
+      background-color: transparent;
       transition: background-color var(--transition-speed) ease;
     }
-     .section#home.active.home-active-centered-fixed { /* This applies when JS makes it active */
+     .section#home.active.home-active-centered-fixed {
         animation: fadeInSmooth 0.6s ease-out forwards;
     }
-
 
     @keyframes fadeInSmooth {
         from { opacity: 0; transform: translateY(20px); }
@@ -588,8 +584,6 @@
     footer {
       position: fixed;
       bottom: 0;
-      /* left and width will be set by JavaScript */
-      /* height will be set by JavaScript based on orientation */
       padding: 0 clamp(15px, 3vw, 20px);
       display: flex;
       flex-direction: column;
@@ -601,6 +595,7 @@
       border-top: 1px solid var(--footer-border);
       z-index: 50;
       transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease, height var(--transition-speed) ease;
+      /* left, width, and height are now fully controlled by JS in updateLayout() */
     }
     footer p {
         margin-bottom: 5px;
@@ -720,94 +715,37 @@
 
     /* Responsive Adjustments */
     @media (max-width: 768px) {
-        /* Sidebar width is handled by JS for layout calculations now */
         .sidebar {
-            width: var(--sidebar-width-mobile);
+            width: var(--sidebar-width-mobile); /* CSS sets initial mobile sidebar width */
         }
-        .sidebar-nav-item svg {
-             width: 22px; height: 22px;
-        }
-        .theme-toggle-button svg {
-            width: 20px; height: 20px;
-        }
-        /* section#home.home-active-centered-fixed left/width handled by JS */
-        .profile-section { /* Ensure padding is consistent on mobile */
-             padding: 15px;
-        }
-        .section:not(#home), .section#resume, .section#contact {
-             padding: 30px clamp(10px, 3vw, 15px);
-        }
-        .info-grid, .contact-details-grid {
-            grid-template-columns: 1fr;
-            gap: clamp(15px, 3vw, 20px);
-        }
+        .sidebar-nav-item svg { width: 22px; height: 22px; }
+        .theme-toggle-button svg { width: 20px; height: 20px; }
+        .profile-section { padding: 15px; }
+        .section:not(#home), .section#resume, .section#contact { padding: 30px clamp(10px, 3vw, 15px); }
+        .info-grid, .contact-details-grid { grid-template-columns: 1fr; gap: clamp(15px, 3vw, 20px); }
         .counters { gap: clamp(10px, 2.5vw, 15px); margin-top: 30px; }
-        #resume .resume-actions .btn {
-            min-width: initial;
-            width: 80%;
-            max-width: 250px;
-        }
-        .modal-content {
-            width: 90%;
-            max-width: 90%; /* Ensure modal doesn't get too wide on slightly larger mobile */
-        }
-        /* Footer left/width handled by JS */
-        footer {
-          padding: 0 clamp(10px, 2.5vw, 15px); /* Adjust padding for mobile */
-        }
+        #resume .resume-actions .btn { min-width: initial; width: 80%; max-width: 250px; }
+        .modal-content { width: 90%; max-width: 90%;}
+        footer { padding: 0 clamp(10px, 2.5vw, 15px); }
     }
 
      @media (max-width: 480px) {
-        .hexagon {
-             margin-bottom: 20px;
-        }
-         .profile-section p.bio {
-            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
-            margin-bottom: 30px;
-        }
-        .circular-skill {
-            margin: clamp(4px, 1vw, 6px);
-        }
-        .counters > div {
-            min-width: 90px;
-            flex-basis: 90px;
-            max-width: 120px;
-        }
-        .contact-card {
-            padding: clamp(15px, 2.5vw, 20px);
-        }
-        .contact-card svg {
-            width: clamp(28px, 4.5vw, 35px);
-            height: clamp(28px, 4.5vw, 35px);
-            margin-bottom: 12px;
-        }
-        .contact-card h3 {
-            font-size: clamp(1rem, 2.2vw, 1.2rem);
-        }
-        .contact-card p {
-            font-size: clamp(0.8rem, 2vw, 0.95rem);
-        }
-        .modal-content {
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        #modalImage {
-            max-height: clamp(140px, 33vh, 230px);
-        }
-        footer p {
-            line-height: 1.3;
-        }
-        footer a {
-            margin: 0 clamp(3px, 0.8vw, 4px);
-        }
+        .hexagon { margin-bottom: 20px; }
+        .profile-section p.bio { font-size: clamp(0.8rem, 2.5vw, 0.95rem); margin-bottom: 30px; }
+        .circular-skill { margin: clamp(4px, 1vw, 6px); }
+        .counters > div { min-width: 90px; flex-basis: 90px; max-width: 120px; }
+        .contact-card { padding: clamp(15px, 2.5vw, 20px); }
+        .contact-card svg { width: clamp(28px, 4.5vw, 35px); height: clamp(28px, 4.5vw, 35px); margin-bottom: 12px; }
+        .contact-card h3 { font-size: clamp(1rem, 2.2vw, 1.2rem); }
+        .contact-card p { font-size: clamp(0.8rem, 2vw, 0.95rem); }
+        .modal-content { margin-top: 20px; margin-bottom: 20px; }
+        #modalImage { max-height: clamp(140px, 33vh, 230px); }
+        footer p { line-height: 1.3; }
+        footer a { margin: 0 clamp(3px, 0.8vw, 4px); }
     }
 
-    /* Landscape orientation adjustments */
     @media (orientation: landscape) and (max-height: 500px) {
-        /* Footer height, main content padding, and home section height will be adjusted by JS */
-        .profile-section {
-            padding-top: 10px; padding-bottom: 10px;
-        }
+        .profile-section { padding-top: 10px; padding-bottom: 10px; }
         h1 { font-size: clamp(1.7rem, 3.8vh, 2.4rem); }
         .typed-text-container { font-size: clamp(0.85rem, 2.3vh, 1.15rem); min-height: 1.8em; }
         .hexagon {
@@ -825,10 +763,12 @@
         .contact-details-grid { gap: clamp(15px, 2.5vh, 20px); }
         .contact-card { padding: clamp(15px, 2.5vh, 20px); }
         .contact-card svg { width: clamp(28px, 4vh, 32px); height: clamp(28px, 4vh, 32px); }
-
         .section:not(#home), .section#resume, .section#contact {
             padding-top: 20px; padding-bottom: 30px;
         }
+        /* Footer height for landscape is now handled by JS in updateLayout */
+        /* Main content padding-bottom for landscape is also handled by JS */
+        /* Home section height for landscape is also handled by JS */
     }
   </style>
 </head>
@@ -1046,7 +986,9 @@
     </div>
   </div>
 
-  <script>
+<script>
+    console.log("Main script block started."); // DEBUG
+
     // DOM Elements
     const particlesLoader = document.getElementById('particles-js-loader');
     const mainContentArea = document.querySelector('.main-content-area');
@@ -1054,26 +996,51 @@
     const sidebarElement = document.querySelector('.sidebar');
     const homeSectionElement = document.getElementById('home');
 
-    // CSS Variable Values (from :root)
-    const CSS_SIDEBAR_WIDTH_VAL = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-val'));
-    const CSS_SIDEBAR_WIDTH_MOBILE_VAL = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-mobile-val'));
-    const CSS_FOOTER_HEIGHT_VAL = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--footer-height-val'));
-    const CSS_FOOTER_HEIGHT_LANDSCAPE_VAL = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--footer-height-landscape-val'));
+    // It's safer to get these values *after* DOMContentLoaded and styles are surely parsed,
+    // or ensure this script runs after the style block. Given it's at the end of body, it's usually fine.
+    let CSS_SIDEBAR_WIDTH_VAL, CSS_SIDEBAR_WIDTH_MOBILE_VAL, CSS_FOOTER_HEIGHT_VAL, CSS_FOOTER_HEIGHT_LANDSCAPE_VAL;
+
+    function getCssVariables() {
+        console.log("Attempting to get CSS variables."); // DEBUG
+        try {
+            const computedStyles = getComputedStyle(document.documentElement);
+            CSS_SIDEBAR_WIDTH_VAL = parseFloat(computedStyles.getPropertyValue('--sidebar-width-val'));
+            CSS_SIDEBAR_WIDTH_MOBILE_VAL = parseFloat(computedStyles.getPropertyValue('--sidebar-width-mobile-val'));
+            CSS_FOOTER_HEIGHT_VAL = parseFloat(computedStyles.getPropertyValue('--footer-height-val'));
+            CSS_FOOTER_HEIGHT_LANDSCAPE_VAL = parseFloat(computedStyles.getPropertyValue('--footer-height-landscape-val'));
+            console.log("CSS Variables Fetched:", { CSS_SIDEBAR_WIDTH_VAL, CSS_SIDEBAR_WIDTH_MOBILE_VAL, CSS_FOOTER_HEIGHT_VAL, CSS_FOOTER_HEIGHT_LANDSCAPE_VAL }); // DEBUG
+        } catch (e) {
+            console.error("Error fetching CSS variables:", e); // DEBUG
+             // Fallback values if CSS variables are not found (highly unlikely with inline styles)
+            CSS_SIDEBAR_WIDTH_VAL = 72;
+            CSS_SIDEBAR_WIDTH_MOBILE_VAL = 60;
+            CSS_FOOTER_HEIGHT_VAL = 75;
+            CSS_FOOTER_HEIGHT_LANDSCAPE_VAL = 60;
+            console.warn("Using fallback CSS variable values."); //DEBUG
+        }
+    }
 
 
     function initializeLucide() {
+        console.log("Attempting to initialize Lucide icons."); // DEBUG
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
+            console.log("Lucide icons initialized."); // DEBUG
         } else {
-            console.warn("Lucide icons not available. Retrying...");
+            console.warn("Lucide library not available at initial call. Retrying...");
             setTimeout(() => {
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-                else console.error("Lucide still not available.");
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                    console.log("Lucide icons initialized after delay."); // DEBUG
+                } else {
+                    console.error("Lucide library still not available after timeout."); // DEBUG
+                }
             }, 500);
         }
     }
 
     function initParticles() {
+        console.log("Attempting to initialize Particles.js."); // DEBUG
         if (typeof particlesJS !== 'undefined') {
             try {
                 particlesJS("particles-js", {
@@ -1092,69 +1059,84 @@
                     },
                     retina_detect: true
                 }, () => {
-                    console.log('particles.js initialized, hiding loader.');
+                    console.log('particles.js initialized successfully, hiding loader.'); // DEBUG
                     if (particlesLoader) particlesLoader.classList.add('loaded');
                 });
             } catch (error) {
-                console.error('Error initializing particles.js:', error);
-                if (particlesLoader) particlesLoader.classList.add('loaded');
+                console.error('Error initializing particles.js:', error); // DEBUG
+                if (particlesLoader) particlesLoader.classList.add('loaded'); // Still hide loader on error
             }
         } else {
-            console.warn("particles.js library not loaded. Hiding loader.");
+            console.warn("particles.js library was not loaded. Hiding loader."); // DEBUG
             if (particlesLoader) particlesLoader.classList.add('loaded');
         }
     }
 
     function initTypedJS() {
+        console.log("Attempting to initialize Typed.js."); // DEBUG
         if (typeof Typed !== 'undefined') {
             new Typed("#typed-text-output", {
                 strings: ["Data Analyst", "ML Enthusiast", "Power BI Specialist", "Data Storyteller"],
                 typeSpeed: 65, backSpeed: 35, loop: true, backDelay: 1600, smartBackspace: true, showCursor: true, cursorChar: "|"
             });
+            console.log("Typed.js initialized."); // DEBUG
         } else {
-            console.warn("Typed.js not loaded");
+            console.warn("Typed.js not loaded. Setting fallback text."); // DEBUG
             const typedOutputEl = document.getElementById("typed-text-output");
             if (typedOutputEl) typedOutputEl.textContent = "Data Analyst";
         }
     }
 
     function updateLayout() {
-        if (!footerElement || !mainContentArea || !sidebarElement) {
-            console.error("Required layout elements not found for updateLayout.");
+        console.log("updateLayout function called."); // DEBUG
+        if (!footerElement || !mainContentArea || !sidebarElement || !homeSectionElement) {
+            console.error("Critical layout elements missing in updateLayout:", {footerElement, mainContentArea, sidebarElement, homeSectionElement}); // DEBUG
             return;
         }
+         if (typeof CSS_SIDEBAR_WIDTH_VAL === 'undefined') { // Check if CSS vars are loaded
+            console.warn("CSS variables not yet loaded in updateLayout. Attempting to fetch them now."); // DEBUG
+            getCssVariables(); // Try to load them if not already
+            if (typeof CSS_SIDEBAR_WIDTH_VAL === 'undefined') { // Check again
+                 console.error("CSS variables still undefined in updateLayout after trying to fetch. Layout may be incorrect."); // DEBUG
+                 return; // Exit if critical values are missing
+            }
+        }
+
 
         const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        console.log("updateLayout - Viewport dimensions:", { viewportWidth, viewportHeight }); // DEBUG
+
         const isMobile = viewportWidth <= 768;
         const isLandscapeMobile = window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches;
+        console.log("updateLayout - Device state:", { isMobile, isLandscapeMobile }); // DEBUG
 
         let currentSidebarWidth = isMobile ? CSS_SIDEBAR_WIDTH_MOBILE_VAL : CSS_SIDEBAR_WIDTH_VAL;
         let currentFooterHeight = isLandscapeMobile ? CSS_FOOTER_HEIGHT_LANDSCAPE_VAL : CSS_FOOTER_HEIGHT_VAL;
+        console.log("updateLayout - Calculated dimensions:", { currentSidebarWidth, currentFooterHeight }); // DEBUG
 
-        // Update sidebar style directly (if it changes based on JS logic, though CSS handles it now)
         sidebarElement.style.width = currentSidebarWidth + 'px';
-
-        // Update main content area
         mainContentArea.style.marginLeft = currentSidebarWidth + 'px';
         mainContentArea.style.paddingBottom = currentFooterHeight + 'px';
 
-        // Update footer
         footerElement.style.left = currentSidebarWidth + 'px';
         footerElement.style.width = (viewportWidth - currentSidebarWidth) + 'px';
         footerElement.style.height = currentFooterHeight + 'px';
 
-        // Update active home section if it's the one with special fixed layout
-        if (homeSectionElement && homeSectionElement.classList.contains('home-active-centered-fixed')) {
+        if (homeSectionElement.classList.contains('home-active-centered-fixed')) {
+            console.log("updateLayout - Updating active home section styles."); // DEBUG
             homeSectionElement.style.left = currentSidebarWidth + 'px';
             homeSectionElement.style.width = (viewportWidth - currentSidebarWidth) + 'px';
-            homeSectionElement.style.height = (window.innerHeight - currentFooterHeight) + 'px';
+            homeSectionElement.style.height = (viewportHeight - currentFooterHeight) + 'px';
         }
+        console.log("updateLayout function finished."); // DEBUG
     }
 
 
     function setSection(id) {
+      console.log(`setSection called for ID: ${id}`); // DEBUG
       if (!mainContentArea) {
-          console.error("Main content area not found for setSection.");
+          console.error("Main content area not found for setSection."); // DEBUG
           return;
       }
       mainContentArea.scrollTop = 0;
@@ -1166,31 +1148,43 @@
 
       const targetSection = document.getElementById(id);
       if (targetSection) {
+        console.log(`Target section ${id} found.`); // DEBUG
         if (id === 'home') {
           targetSection.classList.add('home-active-centered-fixed');
           targetSection.style.display = 'flex';
+          console.log("Home section set to active-centered-fixed."); // DEBUG
         } else {
           targetSection.style.display = 'block';
         }
-        // Update layout immediately after changing home section structure
-        updateLayout(); // Crucial for home-active-centered-fixed
+        
+        updateLayout(); // Call updateLayout immediately after structural changes like 'home-active-centered-fixed'
 
         requestAnimationFrame(() => {
-            setTimeout(() => targetSection.classList.add('active'), 10); // For animation
+            setTimeout(() => {
+                targetSection.classList.add('active'); // For animation
+                console.log(`Section ${id} class 'active' added.`); // DEBUG
+            }, 10);
         });
       } else {
-          console.warn(`Section with id '${id}' not found.`);
+          console.warn(`Section with id '${id}' not found.`); // DEBUG
       }
 
       document.querySelectorAll('.sidebar-nav-item').forEach(item => item.classList.remove('active'));
       const activeNavItem = Array.from(document.querySelectorAll('.sidebar-nav-item')).find(item => item.getAttribute('onclick') === `setSection('${id}')`);
-      if (activeNavItem) activeNavItem.classList.add('active');
+      if (activeNavItem) {
+          activeNavItem.classList.add('active');
+          console.log(`Sidebar item for ${id} set to active.`); // DEBUG
+      }
     }
 
     function animateCounters() {
+        console.log("Animating counters."); // DEBUG
         document.querySelectorAll('.counter').forEach(counter => {
             const target = +counter.getAttribute('data-target');
-            if (isNaN(target)) return;
+            if (isNaN(target)) {
+                console.warn("Invalid data-target for counter:", counter); // DEBUG
+                return;
+            }
             let startTime = null;
             const duration = 1800;
             const step = (timestamp) => {
@@ -1213,8 +1207,9 @@
     const modalDetailLink = document.getElementById('modalDetailLink');
 
     function showDetailsModal(title, descriptionHTML, imageUrl, detailLinkUrl) {
+      console.log("Showing details modal:", title); // DEBUG
       if (!modal || !modalImage || !modalTitle || !modalDescriptionContainer || !modalDetailLinkContainer || !modalDetailLink) {
-          console.error("Modal elements not found.");
+          console.error("Modal elements not found for showDetailsModal."); // DEBUG
           return;
       }
       modalTitle.textContent = title;
@@ -1224,6 +1219,7 @@
       modalImage.onerror = function() {
           this.onerror=null;
           this.src='https://placehold.co/600x400/172a45/FFFFFF?text=Image+Not+Found&font=poppins';
+          console.warn("Modal image failed to load, using placeholder:", imageUrl); // DEBUG
       };
       if (detailLinkUrl && detailLinkUrl !== '#') {
         modalDetailLink.href = detailLinkUrl;
@@ -1236,6 +1232,7 @@
     }
 
     function closeDetailsModal() {
+      console.log("Closing details modal."); // DEBUG
       if (!modal) return;
       modal.style.display = "none";
       document.body.style.overflow = 'auto';
@@ -1247,6 +1244,7 @@
     const sunIcon = document.getElementById('theme-icon-sun');
 
     function setInitialTheme() {
+        console.log("Setting initial theme."); // DEBUG
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.body.classList.remove('light-mode', 'dark-mode');
         document.body.classList.add(savedTheme === 'light' ? 'light-mode' : 'dark-mode');
@@ -1254,13 +1252,17 @@
             moonIcon.style.display = savedTheme === 'light' ? 'none' : 'block';
             sunIcon.style.display = savedTheme === 'light' ? 'block' : 'none';
         }
+        console.log("Initial theme set to:", savedTheme); // DEBUG
     }
 
     if (themeToggleButton) {
         themeToggleButton.addEventListener('click', () => {
+            console.log("Theme toggle button clicked."); // DEBUG
             const isLight = document.body.classList.toggle('light-mode');
             document.body.classList.toggle('dark-mode', !isLight);
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            const newTheme = isLight ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            console.log("Theme changed to:", newTheme); // DEBUG
             if (moonIcon && sunIcon) {
                 moonIcon.style.display = isLight ? 'none' : 'block';
                 sunIcon.style.display = isLight ? 'block' : 'none';
@@ -1269,12 +1271,18 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOMContentLoaded event fired."); // DEBUG
+      
+      getCssVariables(); // Get CSS vars once DOM is ready
+
       setInitialTheme();
       initializeLucide();
       initParticles();
       initTypedJS();
-      updateLayout(); // Initial layout setup
-      setSection('home'); // Set initial section, which also calls updateLayout
+      
+      console.log("Attempting initial layout update and section set."); // DEBUG
+      updateLayout(); 
+      setSection('home'); 
       animateCounters();
 
       const currentYearEl = document.getElementById('currentYear');
@@ -1289,15 +1297,23 @@
       if (particlesLoader) {
           setTimeout(() => {
               if (!particlesLoader.classList.contains('loaded')) {
-                  console.warn('Failsafe: Hiding particles loader via timeout.');
+                  console.warn('Failsafe timeout: Hiding particles loader.'); // DEBUG
                   particlesLoader.classList.add('loaded');
               }
-          }, 2500); // Slightly increased timeout
+          }, 2500);
       }
 
-      window.addEventListener('resize', updateLayout);
-      window.addEventListener('orientationchange', updateLayout);
+      window.addEventListener('resize', () => {
+          console.log("Window resize event detected."); // DEBUG
+          updateLayout();
+      });
+      window.addEventListener('orientationchange', () => {
+          console.log("Window orientationchange event detected."); // DEBUG
+          updateLayout();
+      });
+      console.log("DOMContentLoaded setup complete."); // DEBUG
     });
+    console.log("Main script block finished parsing (but DOMContentLoaded may not have fired yet)."); // DEBUG
   </script>
 </body>
 </html>
