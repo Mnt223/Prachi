@@ -104,8 +104,8 @@
       transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
       overflow-x: hidden;
       min-height: 100%; /* Ensure body takes at least full viewport height */
-      display: flex; /* Added to help portfolio container take full height if needed */
-      flex-direction: column; /* Added */
+      display: flex; 
+      flex-direction: column; 
     }
 
     /* Particle.js Background Styling & Loader */
@@ -146,15 +146,14 @@
     /* Main Portfolio Container */
     .portfolio-container {
       display: flex;
-      flex-grow: 1; /* Allow it to grow to fill body height */
-      width: 100%; /* Take full width */
+      flex-grow: 1; 
+      width: 100%; 
       position: relative;
       z-index: 1;
     }
 
     /* Sidebar Navigation */
     .sidebar {
-      /* width is set by JS via updateLayout or by media query for initial state */
       background: var(--sidebar-bg);
       display: flex;
       flex-direction: column;
@@ -167,6 +166,8 @@
       z-index: 100;
       box-shadow: 3px 0 12px rgba(0,0,0,0.15);
       transition: background-color var(--transition-speed) ease, width var(--transition-speed) ease;
+      overflow-y: auto; /* MODIFIED: Added for scrollability */
+      /* width is set by JS via updateLayout or by media query for initial state */
     }
     .sidebar-nav-item {
       color: var(--icon-color);
@@ -197,10 +198,11 @@
         color: var(--icon-color);
         cursor: pointer;
         padding: 10px;
-        margin-top: auto;
-        margin-bottom: 10px;
+        margin-top: auto; /* Pushes to the bottom of the flex container (sidebar) */
+        margin-bottom: 10px; /* Space at the very bottom */
         border-radius: var(--border-radius-small);
         transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out, transform 0.2s ease-out;
+        flex-shrink: 0; /* Prevent theme button from shrinking */
     }
     .theme-toggle-button svg {
         width: 22px;
@@ -217,12 +219,11 @@
     /* Main Content Area */
     .main-content-area {
       flex-grow: 1;
-      /* margin-left and padding-bottom are set by JS */
       overflow-y: auto;
       overflow-x: hidden;
-      /* height: 100vh; This might conflict with flex-grow, let JS handle height via home section */
       position: relative;
       transition: margin-left var(--transition-speed) ease;
+      /* margin-left and padding-bottom are set by JS */
     }
 
     .profile-section {
@@ -261,13 +262,13 @@
       justify-content: center;
       position: fixed;
       top: 0;
-      /* left, width, height are set by JS */
       padding: 0;
       z-index: 5;
       overflow-y: auto;
       overflow-x: hidden;
       background-color: transparent;
       transition: background-color var(--transition-speed) ease;
+      /* left, width, height are set by JS */
     }
      .section#home.active.home-active-centered-fixed {
         animation: fadeInSmooth 0.6s ease-out forwards;
@@ -595,7 +596,6 @@
       border-top: 1px solid var(--footer-border);
       z-index: 50;
       transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease, height var(--transition-speed) ease;
-      /* left, width, and height are now fully controlled by JS in updateLayout() */
     }
     footer p {
         margin-bottom: 5px;
@@ -716,7 +716,7 @@
     /* Responsive Adjustments */
     @media (max-width: 768px) {
         .sidebar {
-            width: var(--sidebar-width-mobile); /* CSS sets initial mobile sidebar width */
+            width: var(--sidebar-width-mobile); 
         }
         .sidebar-nav-item svg { width: 22px; height: 22px; }
         .theme-toggle-button svg { width: 20px; height: 20px; }
@@ -766,9 +766,6 @@
         .section:not(#home), .section#resume, .section#contact {
             padding-top: 20px; padding-bottom: 30px;
         }
-        /* Footer height for landscape is now handled by JS in updateLayout */
-        /* Main content padding-bottom for landscape is also handled by JS */
-        /* Home section height for landscape is also handled by JS */
     }
   </style>
 </head>
@@ -996,51 +993,48 @@
     const sidebarElement = document.querySelector('.sidebar');
     const homeSectionElement = document.getElementById('home');
 
-    // It's safer to get these values *after* DOMContentLoaded and styles are surely parsed,
-    // or ensure this script runs after the style block. Given it's at the end of body, it's usually fine.
     let CSS_SIDEBAR_WIDTH_VAL, CSS_SIDEBAR_WIDTH_MOBILE_VAL, CSS_FOOTER_HEIGHT_VAL, CSS_FOOTER_HEIGHT_LANDSCAPE_VAL;
 
     function getCssVariables() {
-        console.log("Attempting to get CSS variables."); // DEBUG
+        console.log("Attempting to get CSS variables."); 
         try {
             const computedStyles = getComputedStyle(document.documentElement);
             CSS_SIDEBAR_WIDTH_VAL = parseFloat(computedStyles.getPropertyValue('--sidebar-width-val'));
             CSS_SIDEBAR_WIDTH_MOBILE_VAL = parseFloat(computedStyles.getPropertyValue('--sidebar-width-mobile-val'));
             CSS_FOOTER_HEIGHT_VAL = parseFloat(computedStyles.getPropertyValue('--footer-height-val'));
             CSS_FOOTER_HEIGHT_LANDSCAPE_VAL = parseFloat(computedStyles.getPropertyValue('--footer-height-landscape-val'));
-            console.log("CSS Variables Fetched:", { CSS_SIDEBAR_WIDTH_VAL, CSS_SIDEBAR_WIDTH_MOBILE_VAL, CSS_FOOTER_HEIGHT_VAL, CSS_FOOTER_HEIGHT_LANDSCAPE_VAL }); // DEBUG
+            console.log("CSS Variables Fetched:", { CSS_SIDEBAR_WIDTH_VAL, CSS_SIDEBAR_WIDTH_MOBILE_VAL, CSS_FOOTER_HEIGHT_VAL, CSS_FOOTER_HEIGHT_LANDSCAPE_VAL }); 
         } catch (e) {
-            console.error("Error fetching CSS variables:", e); // DEBUG
-             // Fallback values if CSS variables are not found (highly unlikely with inline styles)
+            console.error("Error fetching CSS variables:", e); 
             CSS_SIDEBAR_WIDTH_VAL = 72;
             CSS_SIDEBAR_WIDTH_MOBILE_VAL = 60;
             CSS_FOOTER_HEIGHT_VAL = 75;
             CSS_FOOTER_HEIGHT_LANDSCAPE_VAL = 60;
-            console.warn("Using fallback CSS variable values."); //DEBUG
+            console.warn("Using fallback CSS variable values."); 
         }
     }
 
 
     function initializeLucide() {
-        console.log("Attempting to initialize Lucide icons."); // DEBUG
+        console.log("Attempting to initialize Lucide icons."); 
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
-            console.log("Lucide icons initialized."); // DEBUG
+            console.log("Lucide icons initialized."); 
         } else {
             console.warn("Lucide library not available at initial call. Retrying...");
             setTimeout(() => {
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
-                    console.log("Lucide icons initialized after delay."); // DEBUG
+                    console.log("Lucide icons initialized after delay."); 
                 } else {
-                    console.error("Lucide library still not available after timeout."); // DEBUG
+                    console.error("Lucide library still not available after timeout."); 
                 }
             }, 500);
         }
     }
 
     function initParticles() {
-        console.log("Attempting to initialize Particles.js."); // DEBUG
+        console.log("Attempting to initialize Particles.js."); 
         if (typeof particlesJS !== 'undefined') {
             try {
                 particlesJS("particles-js", {
@@ -1059,61 +1053,60 @@
                     },
                     retina_detect: true
                 }, () => {
-                    console.log('particles.js initialized successfully, hiding loader.'); // DEBUG
+                    console.log('particles.js initialized successfully, hiding loader.'); 
                     if (particlesLoader) particlesLoader.classList.add('loaded');
                 });
             } catch (error) {
-                console.error('Error initializing particles.js:', error); // DEBUG
-                if (particlesLoader) particlesLoader.classList.add('loaded'); // Still hide loader on error
+                console.error('Error initializing particles.js:', error); 
+                if (particlesLoader) particlesLoader.classList.add('loaded'); 
             }
         } else {
-            console.warn("particles.js library was not loaded. Hiding loader."); // DEBUG
+            console.warn("particles.js library was not loaded. Hiding loader."); 
             if (particlesLoader) particlesLoader.classList.add('loaded');
         }
     }
 
     function initTypedJS() {
-        console.log("Attempting to initialize Typed.js."); // DEBUG
+        console.log("Attempting to initialize Typed.js."); 
         if (typeof Typed !== 'undefined') {
             new Typed("#typed-text-output", {
                 strings: ["Data Analyst", "ML Enthusiast", "Power BI Specialist", "Data Storyteller"],
                 typeSpeed: 65, backSpeed: 35, loop: true, backDelay: 1600, smartBackspace: true, showCursor: true, cursorChar: "|"
             });
-            console.log("Typed.js initialized."); // DEBUG
+            console.log("Typed.js initialized."); 
         } else {
-            console.warn("Typed.js not loaded. Setting fallback text."); // DEBUG
+            console.warn("Typed.js not loaded. Setting fallback text."); 
             const typedOutputEl = document.getElementById("typed-text-output");
             if (typedOutputEl) typedOutputEl.textContent = "Data Analyst";
         }
     }
 
     function updateLayout() {
-        console.log("updateLayout function called."); // DEBUG
+        console.log("updateLayout function called."); 
         if (!footerElement || !mainContentArea || !sidebarElement || !homeSectionElement) {
-            console.error("Critical layout elements missing in updateLayout:", {footerElement, mainContentArea, sidebarElement, homeSectionElement}); // DEBUG
+            console.error("Critical layout elements missing in updateLayout:", {footerElement, mainContentArea, sidebarElement, homeSectionElement}); 
             return;
         }
-         if (typeof CSS_SIDEBAR_WIDTH_VAL === 'undefined') { // Check if CSS vars are loaded
-            console.warn("CSS variables not yet loaded in updateLayout. Attempting to fetch them now."); // DEBUG
-            getCssVariables(); // Try to load them if not already
-            if (typeof CSS_SIDEBAR_WIDTH_VAL === 'undefined') { // Check again
-                 console.error("CSS variables still undefined in updateLayout after trying to fetch. Layout may be incorrect."); // DEBUG
-                 return; // Exit if critical values are missing
+         if (typeof CSS_SIDEBAR_WIDTH_VAL === 'undefined') { 
+            console.warn("CSS variables not yet loaded in updateLayout. Attempting to fetch them now."); 
+            getCssVariables(); 
+            if (typeof CSS_SIDEBAR_WIDTH_VAL === 'undefined') { 
+                 console.error("CSS variables still undefined in updateLayout after trying to fetch. Layout may be incorrect."); 
+                 return; 
             }
         }
 
-
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        console.log("updateLayout - Viewport dimensions:", { viewportWidth, viewportHeight }); // DEBUG
+        console.log("updateLayout - Viewport dimensions:", { viewportWidth, viewportHeight }); 
 
         const isMobile = viewportWidth <= 768;
         const isLandscapeMobile = window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches;
-        console.log("updateLayout - Device state:", { isMobile, isLandscapeMobile }); // DEBUG
+        console.log("updateLayout - Device state:", { isMobile, isLandscapeMobile }); 
 
         let currentSidebarWidth = isMobile ? CSS_SIDEBAR_WIDTH_MOBILE_VAL : CSS_SIDEBAR_WIDTH_VAL;
         let currentFooterHeight = isLandscapeMobile ? CSS_FOOTER_HEIGHT_LANDSCAPE_VAL : CSS_FOOTER_HEIGHT_VAL;
-        console.log("updateLayout - Calculated dimensions:", { currentSidebarWidth, currentFooterHeight }); // DEBUG
+        console.log("updateLayout - Calculated dimensions:", { currentSidebarWidth, currentFooterHeight }); 
 
         sidebarElement.style.width = currentSidebarWidth + 'px';
         mainContentArea.style.marginLeft = currentSidebarWidth + 'px';
@@ -1124,19 +1117,19 @@
         footerElement.style.height = currentFooterHeight + 'px';
 
         if (homeSectionElement.classList.contains('home-active-centered-fixed')) {
-            console.log("updateLayout - Updating active home section styles."); // DEBUG
+            console.log("updateLayout - Updating active home section styles."); 
             homeSectionElement.style.left = currentSidebarWidth + 'px';
             homeSectionElement.style.width = (viewportWidth - currentSidebarWidth) + 'px';
             homeSectionElement.style.height = (viewportHeight - currentFooterHeight) + 'px';
         }
-        console.log("updateLayout function finished."); // DEBUG
+        console.log("updateLayout function finished."); 
     }
 
 
     function setSection(id) {
-      console.log(`setSection called for ID: ${id}`); // DEBUG
+      console.log(`setSection called for ID: ${id}`); 
       if (!mainContentArea) {
-          console.error("Main content area not found for setSection."); // DEBUG
+          console.error("Main content area not found for setSection."); 
           return;
       }
       mainContentArea.scrollTop = 0;
@@ -1148,41 +1141,41 @@
 
       const targetSection = document.getElementById(id);
       if (targetSection) {
-        console.log(`Target section ${id} found.`); // DEBUG
+        console.log(`Target section ${id} found.`); 
         if (id === 'home') {
           targetSection.classList.add('home-active-centered-fixed');
           targetSection.style.display = 'flex';
-          console.log("Home section set to active-centered-fixed."); // DEBUG
+          console.log("Home section set to active-centered-fixed."); 
         } else {
           targetSection.style.display = 'block';
         }
         
-        updateLayout(); // Call updateLayout immediately after structural changes like 'home-active-centered-fixed'
+        updateLayout(); 
 
         requestAnimationFrame(() => {
             setTimeout(() => {
-                targetSection.classList.add('active'); // For animation
-                console.log(`Section ${id} class 'active' added.`); // DEBUG
+                targetSection.classList.add('active'); 
+                console.log(`Section ${id} class 'active' added.`); 
             }, 10);
         });
       } else {
-          console.warn(`Section with id '${id}' not found.`); // DEBUG
+          console.warn(`Section with id '${id}' not found.`); 
       }
 
       document.querySelectorAll('.sidebar-nav-item').forEach(item => item.classList.remove('active'));
       const activeNavItem = Array.from(document.querySelectorAll('.sidebar-nav-item')).find(item => item.getAttribute('onclick') === `setSection('${id}')`);
       if (activeNavItem) {
           activeNavItem.classList.add('active');
-          console.log(`Sidebar item for ${id} set to active.`); // DEBUG
+          console.log(`Sidebar item for ${id} set to active.`); 
       }
     }
 
     function animateCounters() {
-        console.log("Animating counters."); // DEBUG
+        console.log("Animating counters."); 
         document.querySelectorAll('.counter').forEach(counter => {
             const target = +counter.getAttribute('data-target');
             if (isNaN(target)) {
-                console.warn("Invalid data-target for counter:", counter); // DEBUG
+                console.warn("Invalid data-target for counter:", counter); 
                 return;
             }
             let startTime = null;
@@ -1207,9 +1200,9 @@
     const modalDetailLink = document.getElementById('modalDetailLink');
 
     function showDetailsModal(title, descriptionHTML, imageUrl, detailLinkUrl) {
-      console.log("Showing details modal:", title); // DEBUG
+      console.log("Showing details modal:", title); 
       if (!modal || !modalImage || !modalTitle || !modalDescriptionContainer || !modalDetailLinkContainer || !modalDetailLink) {
-          console.error("Modal elements not found for showDetailsModal."); // DEBUG
+          console.error("Modal elements not found for showDetailsModal."); 
           return;
       }
       modalTitle.textContent = title;
@@ -1219,7 +1212,7 @@
       modalImage.onerror = function() {
           this.onerror=null;
           this.src='https://placehold.co/600x400/172a45/FFFFFF?text=Image+Not+Found&font=poppins';
-          console.warn("Modal image failed to load, using placeholder:", imageUrl); // DEBUG
+          console.warn("Modal image failed to load, using placeholder:", imageUrl); 
       };
       if (detailLinkUrl && detailLinkUrl !== '#') {
         modalDetailLink.href = detailLinkUrl;
@@ -1232,7 +1225,7 @@
     }
 
     function closeDetailsModal() {
-      console.log("Closing details modal."); // DEBUG
+      console.log("Closing details modal."); 
       if (!modal) return;
       modal.style.display = "none";
       document.body.style.overflow = 'auto';
@@ -1244,7 +1237,7 @@
     const sunIcon = document.getElementById('theme-icon-sun');
 
     function setInitialTheme() {
-        console.log("Setting initial theme."); // DEBUG
+        console.log("Setting initial theme."); 
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.body.classList.remove('light-mode', 'dark-mode');
         document.body.classList.add(savedTheme === 'light' ? 'light-mode' : 'dark-mode');
@@ -1252,17 +1245,17 @@
             moonIcon.style.display = savedTheme === 'light' ? 'none' : 'block';
             sunIcon.style.display = savedTheme === 'light' ? 'block' : 'none';
         }
-        console.log("Initial theme set to:", savedTheme); // DEBUG
+        console.log("Initial theme set to:", savedTheme); 
     }
 
     if (themeToggleButton) {
         themeToggleButton.addEventListener('click', () => {
-            console.log("Theme toggle button clicked."); // DEBUG
+            console.log("Theme toggle button clicked."); 
             const isLight = document.body.classList.toggle('light-mode');
             document.body.classList.toggle('dark-mode', !isLight);
             const newTheme = isLight ? 'light' : 'dark';
             localStorage.setItem('theme', newTheme);
-            console.log("Theme changed to:", newTheme); // DEBUG
+            console.log("Theme changed to:", newTheme); 
             if (moonIcon && sunIcon) {
                 moonIcon.style.display = isLight ? 'none' : 'block';
                 sunIcon.style.display = isLight ? 'block' : 'none';
@@ -1271,16 +1264,16 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      console.log("DOMContentLoaded event fired."); // DEBUG
+      console.log("DOMContentLoaded event fired."); 
       
-      getCssVariables(); // Get CSS vars once DOM is ready
+      getCssVariables(); 
 
       setInitialTheme();
       initializeLucide();
       initParticles();
       initTypedJS();
       
-      console.log("Attempting initial layout update and section set."); // DEBUG
+      console.log("Attempting initial layout update and section set."); 
       updateLayout(); 
       setSection('home'); 
       animateCounters();
@@ -1297,23 +1290,23 @@
       if (particlesLoader) {
           setTimeout(() => {
               if (!particlesLoader.classList.contains('loaded')) {
-                  console.warn('Failsafe timeout: Hiding particles loader.'); // DEBUG
+                  console.warn('Failsafe timeout: Hiding particles loader.'); 
                   particlesLoader.classList.add('loaded');
               }
           }, 2500);
       }
 
       window.addEventListener('resize', () => {
-          console.log("Window resize event detected."); // DEBUG
+          console.log("Window resize event detected."); 
           updateLayout();
       });
       window.addEventListener('orientationchange', () => {
-          console.log("Window orientationchange event detected."); // DEBUG
+          console.log("Window orientationchange event detected."); 
           updateLayout();
       });
-      console.log("DOMContentLoaded setup complete."); // DEBUG
+      console.log("DOMContentLoaded setup complete."); 
     });
-    console.log("Main script block finished parsing (but DOMContentLoaded may not have fired yet)."); // DEBUG
+    console.log("Main script block finished parsing (but DOMContentLoaded may not have fired yet)."); 
   </script>
 </body>
 </html>
